@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX_LINE_LENGTH 1024
+#define MAX_WORD_LENGTH 100
+int isStopWord(const char *word, const char stopWords[][MAX_WORD_LENGTH], int
+stopWordCount) {
+ for (int i = 0; i < stopWordCount; i++) {
+ if (strcmp(word, stopWords[i]) == 0) {
+ return 1;
+ }
+ }
+ return 0;
+}
+void removeStopWords(FILE *storyFile, FILE *outputFile, const char stopWords[]
+[MAX_WORD_LENGTH], int stopWordCount) {
+ char line[MAX_LINE_LENGTH];
+ char word[MAX_WORD_LENGTH];
+ while (fgets(line, sizeof(line), storyFile)) {
+ int i = 0, j = 0;
+ while (line[i] != '\0') {
+ // Read word by word
+ if (isalnum(line[i])) {
+ word[j++] = tolower(line[i]);
+ } else {
+ word[j] = '\0';
+ if (j > 0 && !isStopWord(word, stopWords, stopWordCount)) {
+ fprintf(outputFile, "%s ", word);
+ }
+ j = 0;
+ if (line[i] == '.' || line[i] == '!' || line[i] == '?' || line[i] == '\n') {
+ fprintf(outputFile, "%c", line[i]);
+ }
+ }
+ i++;
+ }
+ }
+}
+int main() {
+ FILE *stopWordsFile = fopen("stop_words.txt", "r");
+ FILE *storyFile = fopen("story.txt", "r");
+ FILE *outputFile = fopen("story_without_stopwords.txt", "w");
+ if (stopWordsFile == NULL || storyFile == NULL || outputFile == NULL) {
+ printf("Error opening file(s)!\n");
+ return 1;
+ }
+ char stopWords[1000][MAX_WORD_LENGTH];
+ int stopWordCount = 0;
+ while (fgets(stopWords[stopWordCount], sizeof(stopWords[stopWordCount]), stopWordsFile)) {
+ stopWords[stopWordCount][strcspn(stopWords[stopWordCount], "\n")] = '\0';
+ stopWordCount++;
+ }
+ removeStopWords(storyFile, outputFile, stopWords, stopWordCount);
+ fclose(stopWordsFile);
+ fclose(storyFile);
+ fclose(outputFile);
+ printf("Story without stop words has been saved to 'story_without_stopwords.txt'.\n");
+ return 0;
+}
