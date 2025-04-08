@@ -1,0 +1,13 @@
+%{
+#include <stdio.h>
+%}
+%%
+[aeiouAEIOU] { printf("Vowel\n"); }
+[^aeiou\n\t] { printf("Not a vowel\n"); } // This rule matches non-vowel characters, excluding
+newlines and tabs.
+. { /* Ignore other characters */ }
+%%
+int main() {
+ yylex();
+ return 0;
+}
