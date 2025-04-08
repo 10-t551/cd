@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+void extract_comments(FILE *input, FILE *output) {
+ char line[1024];
+ int in_comment_block = 0;
+ int i;
+ while (fgets(line, sizeof(line), input) != NULL) {
+ int len = strlen(line);
+
+ for (i = 0; i < len; i++) {
+ if (line[i] == '/' && line[i + 1] == '/' && !in_comment_block) {
+ fputs(line + i, output);
+ break;
+ }
+ if (line[i] == '/' && line[i + 1] == '*' && !in_comment_block) {
+ in_comment_block = 1;
+ fputs(line + i, output);
+ i++;
+ continue;
+ }
+ if (in_comment_block && line[i] == '*' && line[i + 1] == '/') {
+ in_comment_block = 0;
+ fputs(line + i, output);
+ break;
+ }
+ }
+ }
+}
+int main() {
+ FILE *input_file, *output_file;
+ char input_filename[100], output_filename[100];
+ printf("Enter the name of the C program file: ");
+ scanf("%s", input_filename);
+ printf("Enter the name for the output file: ");
+ scanf("%s", output_filename);
+ input_file = fopen(input_filename, "r");
+
+ if (input_file == NULL) {
+ printf("Error: Could not open input file %s\n", input_filename);
+ return 1;
+ }
+ output_file = fopen(output_filename, "w");
+ if (output_file == NULL) {
+ printf("Error: Could not open output file %s\n", output_filename);
+ fclose(input_file);
+ return 1;
+ }
+ extract_comments(input_file, output_file);
+ fclose(input_file);
+ fclose(output_file);
+ printf("Comments have been extracted to %s\n", output_filename);
+ return 0;
+}
+Output:-
+Input File(program1.c):-
+#include <stdio.h>
+int main() {
+ // This is a single-line comment
+ printf("Hello, World!"); /* This is a multi-line comment */
+ /* This is another
+ multi-line comment */
+ return 0;
+}
+Output File(comments.txt):-
+// This is a single-line comment
+/* This is a multi-line comment */
+/* This is another
+ multi-line comment */
