@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+ char filename[100];
+ int lineToDelete, lineNumber = 1;
+ char buffer[1024];
+
+ printf("Enter the filename: ");
+ scanf("%s", filename);
+
+ FILE *file = fopen(filename, "r");
+ if (file == NULL) {
+ printf("Error opening file!\n");
+ return 1;
+ }
+
+ printf("Enter the line number to delete: ");
+ scanf("%d", &lineToDelete);
+
+ FILE *tempFile = fopen("temp.txt", "w");
+ if (tempFile == NULL) {
+ printf("Error creating temporary file!\n");
+ fclose(file);
+ return 1;
+ }
+
+ while (fgets(buffer, sizeof(buffer), file)) {
+ if (lineNumber != lineToDelete) {
+ fputs(buffer, tempFile);
+ }
+ lineNumber++;
+ }
+
+ fclose(file);
+ fclose(tempFile);
+
+ remove(filename);
+ rename("temp.txt", filename);
+
+ printf("Line %d has been deleted from the file.\n", lineToDelete);
+
+ return 0;
+}
