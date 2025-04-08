@@ -1,0 +1,38 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+FILE *output_file;
+%}
+%%
+[\t\n] { /* Skip tabs and newlines */ }
+[ ]+ { /* Skip multiple spaces and treat as one space */
+ fputc(' ', output_file);
+ }
+. { fputc(yytext[0], output_file); } // Copy other characters as is
+%%
+int main(int argc, char *argv[]) {
+ if (argc != 3) {
+ printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+ return 1;
+ }
+ // Open the input file for reading
+ FILE *input_file = fopen(argv[1], "r");
+ if (input_file == NULL) {
+ perror("Error opening input file");
+ return 1;
+ }
+ // Open the output file for writing
+ output_file = fopen(argv[2], "w");
+ if (output_file == NULL) {
+ perror("Error opening output file");
+ return 1;
+ }
+ // Redirect the input to read from the file
+ yyin = input_file;
+ // Run the lexical analyzer
+ yylex();
+ // Close the files
+ fclose(input_file);
+ fclose(output_file);
+ return 0;
+}
