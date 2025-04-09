@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+char stack[MAX][10];
+int top = -1;
+char input[MAX];
+
+void shift(char *c) {
+    strcpy(stack[++top], c);
+    stack[top + 1][0] = '\0';
+    printf("Shift: %s\n", stack[top]);
+}
+
+void reduce() {
+    while (top >= 2 && strcmp(stack[top], "E") == 0 && (strcmp(stack[top - 1], "*") == 0 || strcmp(stack[top - 1], "+") == 0) && strcmp(stack[top - 2], "E") == 0) {
+        strcpy(stack[top - 2], "E");
+        top -= 2;
+        printf("Reduce: E → E %s E\n", stack[top + 1]);
+    }
+    
+    if (top >= 0 && strcmp(stack[top], "E") == 0) {
+        printf("Reduce: F → id\n");
+        printf("Reduce: T → F\n");
+    }
+}
+
+int main() {
+    printf("Enter an arithmetic expression (e.g., id+id*id or (id+id)*id): ");
+    scanf("%s", input);
+    
+    for (int i = 0; i < strlen(input); i++) {
+        if (input[i] == 'i' && input[i + 1] == 'd') {
+            shift("id");  // Replace 'id' with 'E'
+            strcpy(stack[top], "E");
+            i++;  // Skip 'd'
+        } else {
+            char temp[2] = {input[i], '\0'};
+            shift(temp);
+        }
+        reduce();
+    }
+    
+    if (top == 0 && strcmp(stack[0], "E") == 0) {
+        printf("Parsing successful!\n");
+    } else {
+        printf("Parsing failed!\n");
+    }
+    return 0;
+}
