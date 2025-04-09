@@ -1,0 +1,52 @@
+//lexal.l
+%{
+    #include "parser.tab.h"
+%}
+
+%%
+
+0         { return ZERO; }
+1         { return ONE; }
+[ \t\n]+  ;         // Ignore whitespace
+.         { return -1; } // Invalid character
+
+%%
+int yywrap() {
+    return 1;
+}
+
+
+// parser.y
+%{
+    #include <stdio.h>
+    #include <stdlib.h>
+    extern int yylex();
+    void yyerror(const char *s);
+%}
+
+%token ZERO ONE
+
+%%
+
+start:
+      ZERO body ZERO { printf("Accepted: Starts and ends with 0\n"); }
+    | ONE  body ONE  { printf("Accepted: Starts and ends with 1\n"); }
+    ;
+
+body:
+      /* Empty */
+    | body ZERO
+    | body ONE
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    printf("Error: %s\n", s);
+}
+
+int main() {
+    printf("Enter a binary string: ");
+    yyparse();
+    return 0;
+}
