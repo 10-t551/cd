@@ -1,0 +1,91 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+char input[100];
+int pos = 0;
+
+void E();
+void E_();
+void T();
+void T_();
+void F();
+
+void error(){
+    printf("Error in Parsing! \n");
+    exit(1);
+}
+
+void match(char expected){
+    if(input[pos] == expected){
+        pos++;
+    }
+    else error();
+}
+
+void E(){
+    printf("Processing E \n");
+    T();
+    E_();
+}
+
+void E_(){
+    if(input[pos] == '+'){
+        match('+');
+        printf("Processing E' -> matches \" + \" \n");
+        T();
+        E_();
+    }
+    else{
+        printf("Processing E' -> Returns \n");
+    }
+}
+
+void T(){
+    printf("Processing T \n");
+    F();
+    T_();
+}
+
+void T_(){
+    if(input[pos] == '*'){
+        match('*');
+        printf("Processing T' -> matches \" * \" \n");
+        F();
+        T_();
+    }
+    else{
+        printf("Processing T' -> Returns \n");
+    }
+}
+
+void F(){
+    printf("processing F \n");
+    if(input[pos] == 'i' && input[pos+1] == 'd'){
+        match('i');
+        match('d');
+        printf("Processing F -> matches \" id \" \n");
+    }
+    else if(input[pos] == '('){
+        match('(');
+        printf("Processing F -> matches \" ( \" \n");
+        E();
+        match(')');
+        printf("Processing F -> matches \" ) \" \n");
+    }
+    else error();
+}
+
+int main(){
+    printf("Enter the input string: \n");
+    scanf("%s", input);
+    printf("Input String: %s \n", input);
+    E();
+    if(input[pos] == '\0'){
+        printf("Parsing Successful! \n");
+    }
+    else{
+        printf("Error In Parsing! \n");
+    }
+    return 0;
+}
