@@ -1,0 +1,34 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<stdbool.h>
+
+bool match_a_star(const char *ch){
+    while(*ch == 'a') ch++;
+    return *ch == '\0';
+}
+
+bool match_a_star_b_plus(const char *str){
+    while(*str == 'a') str++;
+    if(*str != 'b' || *str == '\0'){
+        return false;
+    }
+    while(*str == 'b') str++;
+    return *str == '\0';
+}
+
+int main(){
+    char str[100];
+    printf("Enter a string: ");
+    scanf("%s", str);
+    if(match_a_star(str)){
+        printf("The string matches the pattern a* \n");
+    } 
+    if(match_a_star_b_plus(str)){
+        printf("The string matches the pattern a*b+ \n");
+    }
+    else { 
+        printf("String not accepted.\n"); 
+    }
+    return 0;
+}
